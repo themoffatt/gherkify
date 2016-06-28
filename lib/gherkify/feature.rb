@@ -1,25 +1,23 @@
 require 'gherkify/feature/yuml'
 
 class Gherkify::Feature
-  def initialize(feature, options={})
+  def initialize(feature, options = {})
     @data = feature
     @options = {
       show_notes: false
     }.merge options
   end
 
-  def data
-    @data
-  end
+  attr_reader :data
 
   def actor
-    @data[:children].first[:steps].map{ |s| s[:text] }.each do |e|
+    @data[:children].first[:steps].map { |s| s[:text] }.each do |e|
       if e =~ /^as a/i
         actor = e.sub(/^as a/i, '').sub(/,$/, '').strip
         return trim(actor)
       end
     end
-    return "Actor"
+    'Actor'
   end
 
   def note
@@ -67,21 +65,21 @@ class Gherkify::Feature
     use_case = yuml.use_case
     s << "Use Case: #{use_case.md5}"
     s << use_case.to_s
-    s << "Activities:"
+    s << 'Activities:'
 
     scenarios.each do |e|
       name = scenario_name(e)
       activity = yuml.activity(e)
       s << "#{name} #{activity.md5}:"
-      s << "#{activity.to_s}"
+      s << "#{activity}"
     end
 
     s * "\n"
   end
 
   private
+
   def trim(text)
     text.strip if text
   end
-
 end

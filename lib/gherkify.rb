@@ -8,16 +8,15 @@ require 'stringio'
 require 'json'
 
 class Gherkify
-
   def self.path_to_resource(name)
     File.join(Gherkify.path_to_resources, name)
   end
 
   def self.path_to_resources
-    File.join(File.dirname(File.expand_path(__FILE__)), '..','resources')
+    File.join(File.dirname(File.expand_path(__FILE__)), '..', 'resources')
   end
 
-  def initialize(files, options={})
+  def initialize(files, options = {})
     @files = files
 
     @options = {
@@ -31,7 +30,7 @@ class Gherkify
   #
   # @param files [Array] the array of feature files to be parsed
   # @return [Array] the array of parsed features
-  def self.parse_files(files, options={})
+  def self.parse_files(files, options = {})
     Gherkify.new(files, options)
   end
 
@@ -40,7 +39,7 @@ class Gherkify
   # @param file [String] the path to feature file to be parsed
   # @return [Array] the array of parsed features
   def self.parse_file(file)
-    self.parse_files([file])
+    parse_files([file])
   end
 
   def features
@@ -51,8 +50,8 @@ class Gherkify
     parse_files
   end
 
-  def parse_files(files=nil)
-    @files = files if !files.nil?
+  def parse_files(files = nil)
+    @files = files unless files.nil?
     files = @files if files.nil?
 
     pickles = []
@@ -63,7 +62,7 @@ class Gherkify
       pickles << parser.parse(scanner)
     end
 
-    @features = pickles.collect { |e| Gherkify::Feature.new(e[:feature])  }
+    @features = pickles.collect { |e| Gherkify::Feature.new(e[:feature]) }
   end
 
   def check_and_fetch_diagram(diagram, pngs, output_dir)
@@ -78,7 +77,7 @@ class Gherkify
 
     pngs = []
     Dir.chdir(output_dir) do
-      pngs = Dir.glob("*.png")
+      pngs = Dir.glob('*.png')
     end
 
     features.each do |feature|
@@ -100,8 +99,8 @@ class Gherkify
         all[screen_name] = data
         next
       else
-        all[screen_name].each do |k, v|
-          all[screen_name][k] += data[k] if !data[k].nil?
+        all[screen_name].each do |k, _v|
+          all[screen_name][k] += data[k] unless data[k].nil?
           all[screen_name][k].uniq!
         end
       end
@@ -124,12 +123,11 @@ class Gherkify
   def to_s
     s = []
     features.each { |e| s << e.to_s }
-    s << "UI elements:" << yuml_ui_elements.to_s if yuml_ui_elements
+    s << 'UI elements:' << yuml_ui_elements.to_s if yuml_ui_elements
     s * "\n"
   end
 
-  def to_md(file=nil)
-
+  def to_md(file = nil)
     output_dir = @options[:output_dir]
     image_path = @options[:image_path].sub!(/^#{output_dir}[\/]?/, '')
 
@@ -140,7 +138,7 @@ class Gherkify
     res = Gherkify::SRS.generate(self, srs_opts)
     return res if file.nil?
 
-    writer = open(File.join(output_dir, file), "wb")
+    writer = open(File.join(output_dir, file), 'wb')
     writer.write(res)
     writer.close
   end

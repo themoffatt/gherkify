@@ -4,18 +4,18 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'gherkify/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "gherkify"
+  gem.name          = 'gherkify'
   gem.version       = Gherkify::VERSION
-  gem.authors       = ["Taras Kalapun"]
-  gem.email         = ["t.kalapun@gmail.com"]
-  gem.summary       = %q{Generate yUML diagrams from Gherkin Cucumber feature files}
+  gem.authors       = ['Taras Kalapun']
+  gem.email         = ['t.kalapun@gmail.com']
+  gem.summary       = 'Generate yUML diagrams from Gherkin Cucumber feature files'
   gem.description   = gem.summary
-  gem.homepage      = "https://github.com/xslim/gherkify"
+  gem.homepage      = 'https://github.com/xslim/gherkify'
 
-  gem.files         = `git ls-files`.split($/)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.require_paths = ["lib"]
+  gem.require_paths = ['lib']
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
