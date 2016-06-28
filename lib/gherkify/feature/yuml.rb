@@ -31,9 +31,8 @@ class Gherkify::FeatureYuml
       ui_connection = nil
       ssteps = scenario[:steps]
       ssteps.each do |e|
-        step = e[:name].strip
+        step = e[:text].strip
         step_keyword = e[:keyword].strip 
-
         match_data = MATCH_SCREEN_REGEXP.match(step)
         if match_data
           screen_name = match_data[:name]
@@ -75,7 +74,7 @@ class Gherkify::FeatureYuml
               # TODO: elements << button_type
             end
           end
-          
+
           button_name.sub!(/^['"](?<name>.+)['"]$/, '\k<name>')
           if button_name && !@ui_screens[screen_name][:buttons].include?(button_name)
             @ui_screens[screen_name][:buttons] << button_name
@@ -91,8 +90,7 @@ class Gherkify::FeatureYuml
   end
 
   def self.trim(text)
-    # text.gsub!('-', '‐') # yUML '-' bug
-    text.gsub(/[,()\[\]^><-]/, '').strip
+    text.gsub(/[,()\[\]^><-]/, '').strip if text
   end
 
   def self.use_case(actor, feature, scenarios_names, note=nil, scale=75)
@@ -191,10 +189,9 @@ class Gherkify::FeatureYuml
     steps[:ok] << last_step
 
     ssteps.each_with_index do |e, i|
-      step = trim(e[:name])
+      step = trim(e[:text])
 
-      # puts "key: #{e[:keyword]}"
-      case e[:keyword].strip 
+      case e[:keyword].strip
       when 'Given'
         curr_step = :given
       when 'When'
@@ -223,8 +220,10 @@ class Gherkify::FeatureYuml
       end
 
       # Clean up step a bit
-      step.sub!(/^I am /i, '') if strip_i
-      step.sub!(/^I /i, '') if strip_i
+      if strip_i && step
+        step.sub!(/^I am /i, '')
+        step.sub!(/^I /i, '')
+      end
 
       # collect next data
       steps[curr_step] << step
@@ -236,7 +235,7 @@ class Gherkify::FeatureYuml
         dumped_steps    = dumped[:steps]
         last_step       = dumped[:last_step]
         steps[:ok]     += dumped_steps
-        
+
         # Clean steps
         steps[prev_step] = []
         prev_connector = curr_connector

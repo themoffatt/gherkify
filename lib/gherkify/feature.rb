@@ -3,7 +3,6 @@ require 'gherkify/feature/yuml'
 class Gherkify::Feature
   def initialize(feature, options={})
     @data = feature
-
     @options = {
       show_notes: false
     }.merge options
@@ -12,9 +11,9 @@ class Gherkify::Feature
   def data
     @data
   end
-  
+
   def actor
-    @data[:description].split("\n").each do |e|
+    @data[:children].first[:steps].map{ |s| s[:text] }.each do |e|
       if e =~ /^as a/i
         actor = e.sub(/^as a/i, '').sub(/,$/, '').strip
         return trim(actor)
@@ -38,7 +37,7 @@ class Gherkify::Feature
   end
 
   def scenarios
-    @data[:elements].select do |e| 
+    @data[:children].select do |e|
       is_scenario = e[:keyword] == 'Scenario'
       ignore = scenario_tags(e).include?('@gherkify-ignore')
       is_scenario && !ignore
@@ -77,15 +76,12 @@ class Gherkify::Feature
       s << "#{activity.to_s}"
     end
 
-    # s << "UI elements:"
-    # s << "#{ui_elements.inspect}" 
-
     s * "\n"
   end
 
   private
   def trim(text)
-    text.strip
+    text.strip if text
   end
-  
+
 end

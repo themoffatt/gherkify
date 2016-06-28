@@ -2,8 +2,8 @@ require 'gherkify/version'
 require 'gherkify/feature'
 require 'gherkify/srs'
 
-require 'gherkin/parser/parser'
-require 'gherkin/formatter/json_formatter'
+require 'gherkin/parser'
+require 'gherkin/token_formatter_builder'
 require 'stringio'
 require 'json'
 
@@ -55,18 +55,15 @@ class Gherkify
     @files = files if !files.nil?
     files = @files if files.nil?
 
-    io = StringIO.new
-    formatter = Gherkin::Formatter::JSONFormatter.new(io)
-    parser = Gherkin::Parser::Parser.new(formatter)
-
+    pickles = []
     files.each do |path|
-      parser.parse(IO.read(path), path, 0)
+      feature_text = File.open(path, 'r')
+      scanner = Gherkin::TokenScanner.new(feature_text)
+      parser = Gherkin::Parser.new
+      pickles << parser.parse(scanner)
     end
 
-    formatter.done
-    features_data = JSON.parse(io.string, :symbolize_names => true)
-    # ap JSON.parse(io.string, :symbolize_names => true)
-    @features = features_data.collect { |e| Gherkify::Feature.new(e)  }
+    @features = pickles.collect { |e| Gherkify::Feature.new(e[:feature])  }
   end
 
   def check_and_fetch_diagram(diagram, pngs, output_dir)
@@ -87,7 +84,7 @@ class Gherkify
     features.each do |feature|
       use_case = feature.yuml.use_case
       check_and_fetch_diagram(use_case, pngs, output_dir)
-      
+
       feature.scenarios.each do |e|
         activity = feature.yuml.activity(e)
         check_and_fetch_diagram(activity, pngs, output_dir)
@@ -95,11 +92,9 @@ class Gherkify
     end
 
     check_and_fetch_diagram(yuml_ui_elements, pngs, output_dir) if yuml_ui_elements
-
   end
 
   def ui_elements_merge!(all, current)
-    #@ui_screens[screen_name] = { buttons: [], connections: [] } if @ui_screens[screen_name].nil?
     current.each do |screen_name, data|
       if all[screen_name].nil?
         all[screen_name] = data
@@ -149,5 +144,4 @@ class Gherkify
     writer.write(res)
     writer.close
   end
-
 end

@@ -17,15 +17,15 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'gherkin'
-  gem.add_dependency 'slop'
-  gem.add_dependency 'ruby-yuml'
-  gem.add_dependency 'handlebars'
-
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'bundler'
   gem.add_development_dependency 'aruba'
   gem.add_development_dependency 'awesome_print'
   gem.add_development_dependency 'pry'
+
+  gem.add_dependency 'slop'
+  gem.add_dependency 'ruby-yuml'
+  gem.add_dependency 'handlebars'
+  gem.add_dependency 'gherkin'
 end

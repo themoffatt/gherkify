@@ -6,11 +6,11 @@ describe Gherkify::FeatureYuml do
 
   def sample_scenario
     {steps: [
-      { keyword: 'Given', name: 'I have house' },
-      { keyword: 'When',  name: 'I plant a tree' },
-      { keyword: 'And',   name: 'I plant a second tree' },
-      { keyword: 'Then',  name: 'I have two trees' },
-      { keyword: 'And',   name: 'a house' }
+      { keyword: 'Given', text: 'I have house' },
+      { keyword: 'When',  text: 'I plant a tree' },
+      { keyword: 'And',   text: 'I plant a second tree' },
+      { keyword: 'Then',  text: 'I have two trees' },
+      { keyword: 'And',   text: 'a house' }
       ]
     }
   end
@@ -39,5 +39,4 @@ describe Gherkify::FeatureYuml do
     expected = "1bf8e91967ec177d335720a062644545"
     yuml.md5.should == expected
   end
-  
 end
