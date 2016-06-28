@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gherkify do
 
-  it "should parse file" do    
+  it "should parse file" do
     file = fixture_path('download_files.feature')
     gherkify = Gherkify.parse_file(file)
     features = gherkify.features

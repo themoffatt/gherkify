@@ -2,22 +2,21 @@ require 'gherkify/version'
 require 'gherkify/feature'
 require 'gherkify/srs'
 
-require 'gherkin/parser/parser'
-require 'gherkin/formatter/json_formatter'
+require 'gherkin/parser'
+require 'gherkin/token_formatter_builder'
 require 'stringio'
 require 'json'
 
 class Gherkify
-
   def self.path_to_resource(name)
     File.join(Gherkify.path_to_resources, name)
   end
 
   def self.path_to_resources
-    File.join(File.dirname(File.expand_path(__FILE__)), '..','resources')
+    File.join(File.dirname(File.expand_path(__FILE__)), '..', 'resources')
   end
 
-  def initialize(files, options={})
+  def initialize(files, options = {})
     @files = files
 
     @options = {
@@ -31,7 +30,7 @@ class Gherkify
   #
   # @param files [Array] the array of feature files to be parsed
   # @return [Array] the array of parsed features
-  def self.parse_files(files, options={})
+  def self.parse_files(files, options = {})
     Gherkify.new(files, options)
   end
 
@@ -40,7 +39,7 @@ class Gherkify
   # @param file [String] the path to feature file to be parsed
   # @return [Array] the array of parsed features
   def self.parse_file(file)
-    self.parse_files([file])
+    parse_files([file])
   end
 
   def features
@@ -51,22 +50,19 @@ class Gherkify
     parse_files
   end
 
-  def parse_files(files=nil)
-    @files = files if !files.nil?
+  def parse_files(files = nil)
+    @files = files unless files.nil?
     files = @files if files.nil?
 
-    io = StringIO.new
-    formatter = Gherkin::Formatter::JSONFormatter.new(io)
-    parser = Gherkin::Parser::Parser.new(formatter)
-
+    pickles = []
     files.each do |path|
-      parser.parse(IO.read(path), path, 0)
+      feature_text = File.open(path, 'r')
+      scanner = Gherkin::TokenScanner.new(feature_text)
+      parser = Gherkin::Parser.new
+      pickles << parser.parse(scanner)
     end
 
-    formatter.done
-    features_data = JSON.parse(io.string, :symbolize_names => true)
-    # ap JSON.parse(io.string, :symbolize_names => true)
-    @features = features_data.collect { |e| Gherkify::Feature.new(e)  }
+    @features = pickles.collect { |e| Gherkify::Feature.new(e[:feature]) }
   end
 
   def check_and_fetch_diagram(diagram, pngs, output_dir)
@@ -81,13 +77,13 @@ class Gherkify
 
     pngs = []
     Dir.chdir(output_dir) do
-      pngs = Dir.glob("*.png")
+      pngs = Dir.glob('*.png')
     end
 
     features.each do |feature|
       use_case = feature.yuml.use_case
       check_and_fetch_diagram(use_case, pngs, output_dir)
-      
+
       feature.scenarios.each do |e|
         activity = feature.yuml.activity(e)
         check_and_fetch_diagram(activity, pngs, output_dir)
@@ -95,18 +91,16 @@ class Gherkify
     end
 
     check_and_fetch_diagram(yuml_ui_elements, pngs, output_dir) if yuml_ui_elements
-
   end
 
   def ui_elements_merge!(all, current)
-    #@ui_screens[screen_name] = { buttons: [], connections: [] } if @ui_screens[screen_name].nil?
     current.each do |screen_name, data|
       if all[screen_name].nil?
         all[screen_name] = data
         next
       else
-        all[screen_name].each do |k, v|
-          all[screen_name][k] += data[k] if !data[k].nil?
+        all[screen_name].each do |k, _v|
+          all[screen_name][k] += data[k] unless data[k].nil?
           all[screen_name][k].uniq!
         end
       end
@@ -129,12 +123,11 @@ class Gherkify
   def to_s
     s = []
     features.each { |e| s << e.to_s }
-    s << "UI elements:" << yuml_ui_elements.to_s if yuml_ui_elements
+    s << 'UI elements:' << yuml_ui_elements.to_s if yuml_ui_elements
     s * "\n"
   end
 
-  def to_md(file=nil)
-
+  def to_md(file = nil)
     output_dir = @options[:output_dir]
     image_path = @options[:image_path].sub!(/^#{output_dir}[\/]?/, '')
 
@@ -145,9 +138,8 @@ class Gherkify
     res = Gherkify::SRS.generate(self, srs_opts)
     return res if file.nil?
 
-    writer = open(File.join(output_dir, file), "wb")
+    writer = open(File.join(output_dir, file), 'wb')
     writer.write(res)
     writer.close
   end
-
 end

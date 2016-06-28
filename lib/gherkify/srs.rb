@@ -2,17 +2,15 @@ require 'handlebars'
 
 # TODO: Separate this some day
 class Gherkify::SRS
-
-  def initialize(gherkify, options={})
+  def initialize(gherkify, options = {})
     @gherkify = gherkify
-      
+
     @options = {
       show_gherkin_src: false,
       show_yuml_src: false,
       image_path: ''
     }.merge options
   end
-
 
   def img_path(image_name)
     File.join(@options[:image_path], "#{image_name}.png")
@@ -34,8 +32,8 @@ class Gherkify::SRS
       scenarios = []
       feature.scenarios.each do |e|
         activity = feature.yuml.activity(e)
-        one_scenario = { 
-          name: feature.scenario_name(e), 
+        one_scenario = {
+          name: feature.scenario_name(e),
           image: scenario_image(activity)
         }
         one_scenario[:yuml] = activity.to_s if @options[:show_yuml_src]
@@ -65,8 +63,7 @@ class Gherkify::SRS
     img_path(ui_elements_diagram.md5)
   end
 
-  def self.generate(gherkify, options={}, template_options={})
-  
+  def self.generate(gherkify, options = {}, template_options = {})
     template_path = Gherkify.path_to_resource('srs_template.md')
 
     options = {
@@ -90,5 +87,4 @@ class Gherkify::SRS
 
     template.call(template_options)
   end
-  
 end

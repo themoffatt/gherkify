@@ -4,23 +4,18 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'gherkify/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "gherkify"
+  gem.name          = 'gherkify'
   gem.version       = Gherkify::VERSION
-  gem.authors       = ["Taras Kalapun"]
-  gem.email         = ["t.kalapun@gmail.com"]
-  gem.summary       = %q{Generate yUML diagrams from Gherkin Cucumber feature files}
+  gem.authors       = ['Taras Kalapun']
+  gem.email         = ['t.kalapun@gmail.com']
+  gem.summary       = 'Generate yUML diagrams from Gherkin Cucumber feature files'
   gem.description   = gem.summary
-  gem.homepage      = "https://github.com/xslim/gherkify"
+  gem.homepage      = 'https://github.com/xslim/gherkify'
 
-  gem.files         = `git ls-files`.split($/)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.require_paths = ["lib"]
-
-  gem.add_dependency 'gherkin'
-  gem.add_dependency 'slop'
-  gem.add_dependency 'ruby-yuml'
-  gem.add_dependency 'handlebars'
+  gem.require_paths = ['lib']
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
@@ -28,4 +23,9 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'aruba'
   gem.add_development_dependency 'awesome_print'
   gem.add_development_dependency 'pry'
+
+  gem.add_dependency 'slop'
+  gem.add_dependency 'ruby-yuml'
+  gem.add_dependency 'handlebars'
+  gem.add_dependency 'gherkin'
 end

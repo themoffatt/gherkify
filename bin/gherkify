@@ -35,9 +35,9 @@ def main
   end
 
   if File.directory? features_path
-    files = Dir.glob(File.join(features_path, "*.feature"))
+    files = Dir.glob(File.join(features_path, '*.feature'))
   elsif File.directory? path
-    files = Dir.glob(File.join(path, "*.feature"))
+    files = Dir.glob(File.join(path, '*.feature'))
   else
     files = [features_path]
   end
@@ -47,7 +47,7 @@ def main
   debug = opts.dry?
 
   options = {
-    output_dir: output_dir, 
+    output_dir: output_dir,
     debug: debug,
     image_path: image_path
   }
@@ -55,8 +55,8 @@ def main
   gherkify = Gherkify.parse_files(files, options)
 
   if opts.dry? && opts.md?
-    puts "Generated Markdown:"
-    puts gherkify.to_md()
+    puts 'Generated Markdown:'
+    puts gherkify.to_md
   elsif opts.dry? && !opts.md?
     puts gherkify.to_s
   else
